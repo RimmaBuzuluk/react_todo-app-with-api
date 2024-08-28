@@ -37,29 +37,36 @@ export const TodoItem: React.FC<Props> = ({
   };
 
   const handleTitleSubmit = () => {
-    const isUnic = todos?.every(
-      todoItem => todoItem.title !== editedTitle.trim(),
-    );
+    const trimmedTitle = editedTitle.trim();
+    const isUnique = todos?.every(todoItem => todoItem.title !== trimmedTitle);
 
-    if (editedTitle.trim() && updateTitle && isUnic) {
-      updateTitle(todo.id, editedTitle.trim())
+    if (trimmedTitle === todo.title) {
+      // Якщо заголовок не змінився, закриваємо інпут
+      setIsEditing(false);
+      return;
+    }
+
+    if (!trimmedTitle) {
+      // Якщо заголовок порожній, видаляємо завдання
+      handleDelete(todo.id);
+      return;
+    }
+
+    if (!isUnique) {
+      // Якщо заголовок не унікальний, не змінюємо і закриваємо інпут
+      setEditedTitle(todo.title);
+      setIsEditing(false);
+      return;
+    }
+
+    if (updateTitle) {
+      updateTitle(todo.id, trimmedTitle)
         .then(() => {
-          setIsEditing(false);
+          setIsEditing(false); // Закриваємо інпут після успішного оновлення
         })
         .catch(() => {
-          setIsEditing(true);
+          setIsEditing(true); // У разі помилки залишаємо інпут відкритим
         });
-    } else {
-      if (!isUnic) {
-        setEditedTitle(todo.title);
-        setIsEditing(false);
-      }
-
-      if (!editedTitle.trim()) {
-        handleDelete(todo.id);
-      }
-
-      setIsEditing(true);
     }
   };
 
