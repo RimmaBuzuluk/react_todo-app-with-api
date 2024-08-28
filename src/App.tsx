@@ -115,7 +115,6 @@ export const App: React.FC = () => {
           setTimeout(() => {
             if (inputRef.current) {
               inputRef.current.focus();
-              console.log('Focus set with timeout');
             }
           }, 0);
         });
