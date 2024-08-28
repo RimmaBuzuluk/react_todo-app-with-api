@@ -9,7 +9,7 @@ type Props = {
   handleDelete: (id: number) => void;
   isProcessing: boolean;
   updateCompleted?: (id: number, completed: boolean) => void;
-  updateTitle?: (id: number, newTitle: string) => void;
+  updateTitle?: (id: number, newTitle: string) => Promise<Todo>;
   todos?: Todo[];
 };
 
@@ -42,18 +42,25 @@ export const TodoItem: React.FC<Props> = ({
     );
 
     if (editedTitle.trim() && updateTitle && isUnic) {
-      updateTitle(todo.id, editedTitle.trim());
-    }
+      updateTitle(todo.id, editedTitle.trim())
+        .then(() => {
+          setIsEditing(false);
+        })
+        .catch(() => {
+          setIsEditing(true);
+        });
+    } else {
+      if (!isUnic) {
+        setEditedTitle(todo.title);
+        setIsEditing(false);
+      }
 
-    if (!isUnic) {
-      setEditedTitle(todo.title);
-    }
+      if (!editedTitle.trim()) {
+        handleDelete(todo.id);
+      }
 
-    if (!editedTitle.trim()) {
-      handleDelete(todo.id);
+      setIsEditing(true);
     }
-
-    setIsEditing(false);
   };
 
   const handleBlur = () => {

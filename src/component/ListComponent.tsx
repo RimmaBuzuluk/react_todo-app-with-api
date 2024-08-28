@@ -12,7 +12,7 @@ type Props = {
   isLoading: boolean;
   tempTodo: Todo | null;
   updateCompleted: (id: number, completed: boolean) => void;
-  updateTitle: (id: number, newTitle: string) => void;
+  updateTitle: (id: number, newTitle: string) => Promise<Todo>;
 };
 
 export const ListComponent: React.FC<Props> = ({

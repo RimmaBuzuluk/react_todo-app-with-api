@@ -150,27 +150,25 @@ export const App: React.FC = () => {
     completedTodos.forEach(todo => handleDelete(todo.id));
   };
 
-  const updateTitle = (todoId: number, newTitle: string) => {
-    // if (newTitle === '') {
-    //   console.log('empty');
-    //   handleDelete(todoId);
-    // }
-
+  const updateTitle = (todoId: number, newTitle: string): Promise<Todo> => {
     const updateTitleObject = { title: newTitle };
 
     setIsLoadingTodo(prev => [...prev, todoId]);
 
-    tadoService
+    return tadoService
       .updateTitleTodos(todoId, updateTitleObject)
-      .then(() =>
+      .then(updatedTodo => {
         setTodos(prevTodos =>
-          prevTodos.map(
-            todo => (todo.id === todoId ? { ...todo, title: newTitle } : todo), // Використовуємо newTitle
+          prevTodos.map(todo =>
+            todo.id === todoId ? { ...todo, title: newTitle } : todo,
           ),
-        ),
-      )
-      .catch(() => {
+        );
+
+        return updatedTodo;
+      })
+      .catch(error => {
         handleError(errorMessages.update);
+        throw error; // Пробросити помилку далі, щоб вона була оброблена у `handleTitleSubmit`
       })
       .finally(() => {
         setIsLoadingTodo(prev => prev.filter(id => id !== todoId));
