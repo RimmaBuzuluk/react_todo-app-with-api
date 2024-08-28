@@ -112,9 +112,12 @@ export const App: React.FC = () => {
         .finally(() => {
           setIsLoading(false);
           setTempTodo(null);
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
+          setTimeout(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              console.log('Focus set with timeout');
+            }
+          }, 0);
         });
     }
   };
