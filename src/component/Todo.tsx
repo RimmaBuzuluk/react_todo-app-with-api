@@ -91,6 +91,7 @@ export const TodoItem: React.FC<Props> = ({
         <input
           className="todo__edit"
           value={editedTitle}
+          data-cy="TodoTitleField"
           onChange={handleTitleChange}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
