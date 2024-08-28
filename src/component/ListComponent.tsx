@@ -12,6 +12,7 @@ type Props = {
   isLoading: boolean;
   tempTodo: Todo | null;
   updateCompleted: (id: number, completed: boolean) => void;
+  updateTitle: (id: number, newTitle: string) => void;
 };
 
 export const ListComponent: React.FC<Props> = ({
@@ -21,6 +22,7 @@ export const ListComponent: React.FC<Props> = ({
   isLoading,
   tempTodo,
   updateCompleted,
+  updateTitle,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -31,6 +33,8 @@ export const ListComponent: React.FC<Props> = ({
           handleDelete={handleDelete}
           isProcessing={isLoadingTodos.includes(todo.id)}
           updateCompleted={updateCompleted}
+          updateTitle={updateTitle}
+          todos={todos}
         />
       ))}
 

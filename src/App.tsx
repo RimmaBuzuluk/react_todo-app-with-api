@@ -5,7 +5,7 @@ import * as tadoService from './api/todos';
 import { ListComponent } from './component/ListComponent';
 import { Footer } from './component/Footer';
 import { Error } from './component/Error';
-import classNames from 'classnames';
+import { Header } from './component/Header';
 
 function filterTodos(todos: Todo[], filter: FilterStatusType) {
   switch (filter) {
@@ -31,11 +31,6 @@ export const App: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isLoadingTodos, setIsLoadingTodo] = useState<number[]>([]);
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
-  const [toggleAllButton, setToggleAllButton] = useState<boolean>(false);
-
-  useEffect(() => {
-    setToggleAllButton(todos.every(todo => todo.completed));
-  }, [todos]);
 
   const handleError = (message: ErrorMessages) => {
     setErrorMessage(message);
@@ -126,10 +121,10 @@ export const App: React.FC = () => {
 
   const updateCompleted = (todoId: number, completed: boolean) => {
     setIsLoadingTodo(prev => [...prev, todoId]);
-    const completedObj = { completed: !completed };
+    const completedObject = { completed: !completed };
 
     tadoService
-      .updateCompletedTodos(todoId, completedObj)
+      .updateCompletedTodos(todoId, completedObject)
       .then(() =>
         setTodos(prevTodos =>
           prevTodos.map(todo =>
@@ -145,25 +140,6 @@ export const App: React.FC = () => {
       });
   };
 
-  const isAllTodoCompleted = todos.every(todo => todo.completed === true);
-  const isAllTodoNotCompleted = todos.every(todo => todo.completed === false);
-
-  const setAllTodoCompleted = () => {
-    if (!isAllTodoCompleted && !isAllTodoNotCompleted) {
-      todos.map(todo => {
-        if (todo.completed === false) {
-          updateCompleted(todo.id, todo.completed);
-        }
-      });
-    }
-
-    if (isAllTodoCompleted || isAllTodoNotCompleted) {
-      todos.map(todo => {
-        updateCompleted(todo.id, todo.completed);
-      });
-    }
-  };
-
   const tasks = filterTodos(todos, filterBy);
 
   const completedTodos = todos.filter(todo => todo.completed);
@@ -172,36 +148,47 @@ export const App: React.FC = () => {
     completedTodos.forEach(todo => handleDelete(todo.id));
   };
 
+  const updateTitle = (todoId: number, newTitle: string) => {
+    // if (newTitle === '') {
+    //   console.log('empty');
+    //   handleDelete(todoId);
+    // }
+
+    const updateTitleObject = { title: newTitle };
+
+    setIsLoadingTodo(prev => [...prev, todoId]);
+
+    tadoService
+      .updateTitleTodos(todoId, updateTitleObject)
+      .then(() =>
+        setTodos(prevTodos =>
+          prevTodos.map(
+            todo => (todo.id === todoId ? { ...todo, title: newTitle } : todo), // Використовуємо newTitle
+          ),
+        ),
+      )
+      .catch(() => {
+        handleError(errorMessages.update);
+      })
+      .finally(() => {
+        setIsLoadingTodo(prev => prev.filter(id => id !== todoId));
+      });
+  };
+
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
 
       <div className="todoapp__content">
-        <header className="todoapp__header">
-          <button
-            type="button"
-            className={classNames('todoapp__toggle-all', {
-              active: toggleAllButton,
-            })}
-            data-cy="ToggleAllButton"
-            onClick={() => setAllTodoCompleted()}
-          />
-
-          <form onSubmit={event => event.preventDefault()}>
-            <input
-              ref={inputRef}
-              data-cy="NewTodoField"
-              type="text"
-              className="todoapp__new-todo"
-              placeholder="What needs to be done?"
-              value={query}
-              onChange={handleQueryChange}
-              onKeyDown={handleAddTodo}
-              autoFocus
-              disabled={isLoading}
-            />
-          </form>
-        </header>
+        <Header
+          todos={todos}
+          handleQueryChange={handleQueryChange}
+          updateCompleted={updateCompleted}
+          query={query}
+          handleAddTodo={handleAddTodo}
+          inputRef={inputRef}
+          isLoading={isLoading}
+        />
 
         <ListComponent
           todos={tasks}
@@ -210,6 +197,7 @@ export const App: React.FC = () => {
           isLoading={isLoading}
           tempTodo={tempTodo}
           updateCompleted={updateCompleted}
+          updateTitle={updateTitle}
         />
         {todos.length > 0 && (
           <Footer

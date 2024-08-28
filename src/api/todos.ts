@@ -18,3 +18,7 @@ export const addTodos = (todo: Omit<Todo, 'id'>) => {
 export const updateCompletedTodos = (todoId: number, complited: any) => {
   return client.patch<Todo>(`/todos/${todoId}`, complited);
 };
+
+export const updateTitleTodos = (todoId: number, title: any) => {
+  return client.patch<Todo>(`/todos/${todoId}`, title);
+};
