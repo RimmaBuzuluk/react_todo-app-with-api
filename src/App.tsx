@@ -168,7 +168,7 @@ export const App: React.FC = () => {
       })
       .catch(error => {
         handleError(errorMessages.update);
-        throw error; // Пробросити помилку далі, щоб вона була оброблена у `handleTitleSubmit`
+        throw error;
       })
       .finally(() => {
         setIsLoadingTodo(prev => prev.filter(id => id !== todoId));

@@ -41,31 +41,31 @@ export const TodoItem: React.FC<Props> = ({
     const isUnique = todos?.every(todoItem => todoItem.title !== trimmedTitle);
 
     if (trimmedTitle === todo.title) {
-      // Якщо заголовок не змінився, закриваємо інпут
       setIsEditing(false);
+
       return;
     }
 
     if (!trimmedTitle) {
-      // Якщо заголовок порожній, видаляємо завдання
       handleDelete(todo.id);
+
       return;
     }
 
     if (!isUnique) {
-      // Якщо заголовок не унікальний, не змінюємо і закриваємо інпут
       setEditedTitle(todo.title);
       setIsEditing(false);
+
       return;
     }
 
     if (updateTitle) {
       updateTitle(todo.id, trimmedTitle)
         .then(() => {
-          setIsEditing(false); // Закриваємо інпут після успішного оновлення
+          setIsEditing(false);
         })
         .catch(() => {
-          setIsEditing(true); // У разі помилки залишаємо інпут відкритим
+          setIsEditing(true);
         });
     }
   };
